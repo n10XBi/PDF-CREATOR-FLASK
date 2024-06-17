@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Generate PDF</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at bottom, #0d1d31 0%, #0c0d13 100%);
+      overflow: hidden;
+      color: #abb2bf;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      position: relative;
+    }
+    h1 {
+      font-size: 24px; /* Mengurangi ukuran font untuk header */
+      color: #fff;
+      margin-bottom: 20px;
+      text-align: center;
+      z-index: 2;
+    }
+    .container {
+      background: rgba(33, 37, 43, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px; /* Menyesuaikan padding */
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      z-index: 2;
+      max-width: 90%; /* Menyesuaikan lebar maksimum */
+      width: 250px; /* Mengurangi lebar kontainer */
+      margin: 20px; /* Memberikan ruang di sekitar kontainer */
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #fff;
+    }
+    input[type="text"], textarea {
+      width: calc(100% - 12px); /* Menyesuaikan lebar input dan textarea */
+      padding: 8px; /* Mengurangi padding */
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      font-size: 14px; /* Mengurangi ukuran font */
+    }
+    input[type="file"] {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    input[type="submit"] {
+      background: #007bff;
+      color: #fff;
+      padding: 8px 15px; /* Mengurangi padding */
+      border: none;
+      border-radius: 5px;
+      font-size: 14px; /* Mengurangi ukuran font */
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    input[type="submit"]:active {
+      transform: scale(0.95);
+    }
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 120%;
+      transform: rotate(-45deg);
+      z-index: 1;
+    }
+    .star {
+      --star-color: rgba(255, 255, 255, 0.5);
+      --star-tail-length: 4em; /* Mengurangi panjang ekor bintang */
+      --star-tail-height: 1px; /* Mengurangi tinggi ekor bintang */
+      --star-width: calc(var(--star-tail-length) / 6);
+      --fall-duration: 9s;
+      --tail-fade-duration: var(--fall-duration);
+
+      position: absolute;
+      top: var(--top-offset);
+      left: 0;
+      width: var(--star-tail-length);
+      height: var(--star-tail-height);
+      color: var(--star-color);
+      background: linear-gradient(45deg, currentColor, transparent);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px currentColor);
+      transform: translate3d(104em, 0, 0);
+      animation: fall var(--fall-duration) var(--fall-delay) linear infinite, tail-fade var(--tail-fade-duration) var(--fall-delay) ease-out infinite;
+    }
+    @keyframes fall {
+      to {
+        transform: translate3d(-30em, 0, 0);
+      }
+    }
+    @keyframes tail-fade {
+      0%, 50% {
+        width: var(--star-tail-length);
+        opacity: 1;
+      }
+      70%, 80% {
+        width: 0;
+        opacity: 0.4;
+      }
+      100% {
+        width: 0;
+        opacity: 0;
+      }
+    }
+    .half-moon {
+      position: absolute;
+      top: 10%;
+      right: 5%;
+      width: 15px; /* Mengurangi ukuran bulan */
+      height: 15px;
+      background: radial-gradient(circle at 50% 50%, #fff, #e0e0e0);
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      z-index: 3;
+      overflow: hidden;
+    }
+    .half-moon::before {
+      content: '';
+      position: absolute;
+      width: 15px; /* Mengurangi ukuran cincin bulan */
+      height: 15px;
+      background: #0d1d3100;
+      border-radius: 50%;
+      left: -10px;
+    }
+    .moon-circle {
+      position: absolute;
+      width: 3px; /* Mengurangi ukuran lingkaran bulan */
+      height: 3px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    }
+    .star-small {
+      box-shadow: 0px 0px 1px 1px rgba(255, 255, 255, 0.4);
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      border-radius: 2px;
+      background-color: white;
+      animation: twinkle 2s infinite; /* Menambahkan animasi berkedip */
+      animation-timing-function: steps(1); /* Menggunakan steps untuk membuat efek berkedip */
+      animation-delay: calc(var(--twinkle-delay) * 1s); /* Menambahkan delay variabel */
+    }
+    @keyframes twinkle {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0;
+      }
+    }
+    .aurora {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200%;
+      height: 100vh;
+      background: linear-gradient(90deg, rgba(255, 0, 150, 0.3), rgba(0, 255, 255, 0.3));
+      opacity: 0.5;
+      z-index: 0;
+      animation: auroraMove 60s linear infinite;
+      will-change: transform;
+    }
+    @keyframes auroraMove {
+      0% {
+        transform: translateX(-50%);
+      }
+      50% {
+        transform: translateX(-40%);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="stars"></div>
+  <div class="half-moon" id="half-moon"></div>
+  <h1>Generate PDF with Custom Text and Images</h1>
+  <div class="container">
+    <form action="/" method="POST" enctype="multipart/form-data">
+      <label for="header">Header:</label>
+      <input type="text" id="header" name="header" required>
+
+      <label for="chapter_title">Chapter Title:</label>
+      <input type="text" id="chapter_title" name="chapter_title" required>
+
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="text">Body Text:</label>
+      <textarea id="text" name="text" rows="10" cols="50" required></textarea>
+
+      <label for="filename">PDF File Name:</label>
+      <input type="text" id="filename" name="filename" required>
+
+      <label for="images">Upload Images (you can select multiple):</label>
+      <input type="file" id="images" name="images" multiple>
+
+      <input type="submit" value="Generate PDF">
+    </form>
+  </div>
+
+  <script>
+    // Function to create falling stars
+    function createStar() {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.setProperty('--top-offset', `${Math.random() * 100}vh`);
+      star.style.setProperty('--fall-delay', `${Math.random() * 3}s`);
+      document.querySelector('.stars').appendChild(star);
+    }
+
+    // Create multiple stars
+    for (let i = 0; i < 10; i++) { // Mengurangi jumlah bintang jatuh
+      createStar();
+    }
+
+    // Function to create small stars
+    function createSmallStar() {
+      const starSmall = document.createElement('div');
+      starSmall.className = 'star-small';
+      starSmall.style.top = `${Math.random() * 100}vh`;
+      starSmall.style.left = `${Math.random() * 100}vw`;
+      starSmall.style.setProperty('--twinkle-delay', `${Math.random() * 10}`); // Menambahkan delay variabel
+      document.body.appendChild(starSmall);
+    }
+
+    // Create multiple small stars
+    for (let i = 0; i < 30; i++) { // Mengurangi jumlah bintang kecil
+      createSmallStar();
+    }
+
+    // Function to create moon circles
+    function createMoonCircle() {
+      const moonCircle = document.createElement('div');
+      moonCircle.className = 'moon-circle';
+      moonCircle.style.top = `${Math.random() * 10}px`; // Mengurangi ukuran top
+      moonCircle.style.left = `${Math.random() * 10}px`; // Mengurangi ukuran left
+      document.getElementById('half-moon').appendChild(moonCircle);
+    }
+
+    // Create multiple moon circles
+    for (let i = 0; i < 3; i++) { // Mengurangi jumlah lingkaran bulan
+      createMoonCircle();
+    }
+  </script>
+</body>
+</html>
