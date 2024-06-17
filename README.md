@@ -75,7 +75,7 @@ Open your web browser and navigate to `http://127.0.0.1:5000/`.
 
 ## Example
 
-![PDF Generator Example](example.png)
+![PDF Generator Example](exeample.jpg)
 
 ## Contributing
 
